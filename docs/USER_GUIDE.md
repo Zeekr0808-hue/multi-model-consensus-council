@@ -17,6 +17,7 @@
 | V1.5.0 | 2026-04-25 | Sync all document versions to V1.5.0; renamed SCHEMA.md; full English content aligned with Chinese |
 | V1.5.1 | 2026-04-26 | Added round-start user notification rule; added convergence score threshold parameter; added exception handling rules section |
 | V1.5.2 | 2026-04-26 | Added judgment method configurable parameter; clarified unanimous-pass rule as default |
+| V1.5.6 | 2026-04-26 | **Sub-agent prohibition**: Judges are strictly prohibited from spawning sub-agents; complex tasks are decomposed and distributed by organizer; removed ambiguous "conclusion convergence principle" |
 
 ---
 
@@ -148,7 +149,7 @@ The decision output is a standardized report containing:
 6. **Risk Advisory** — Key risks and mitigation recommendations
 
 ---
-*Version: V1.5.2*
+*Version: V1.5.6*
 *Developer: Zeekr0808*
 *Email: Zeekr0808@outlook.com*
 
@@ -173,6 +174,7 @@ The decision output is a standardized report containing:
 | V1.5.0 | 2026-04-25 | 同步所有文档版本号至V1.5.0；英文内容全量对齐中文 |
 | V1.5.1 | 2026-04-26 | 新增「每轮开始前通知用户」规则；新增「收敛分差阈值」可配置参数；新增「异常处理规则」章节 |
 | V1.5.2 | 2026-04-26 | 新增「判定方式」可配置参数，明确全票通过制为默认判定规则 |
+| V1.5.6 | 2026-04-26 | **严禁子Agent委托**：评委严禁spawn子Agent，只能独立思考输出结论；复杂任务由组织者拆解分发；删除原「结论收敛原则」避免歧义 |
 
 ---
 
@@ -297,6 +299,6 @@ The decision output is a standardized report containing:
 6. **风险提示** — 主要风险与缓解建议
 
 ---
-*版本: V1.5.2*
+*版本: V1.5.6*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*
