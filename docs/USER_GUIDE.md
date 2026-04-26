@@ -150,6 +150,7 @@ The decision output is a standardized report containing:
 ---
 *Version: V1.5.2*
 *Developer: Zeekr0808*
+*Email: Zeekr0808@outlook.com*
 
 ---
 
@@ -298,4 +299,4 @@ The decision output is a standardized report containing:
 ---
 *版本: V1.5.2*
 *开发者: Zeekr0808*
-*更新时间: 2026-04-25*
+*邮箱: Zeekr0808@outlook.com*
