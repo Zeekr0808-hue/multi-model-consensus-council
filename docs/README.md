@@ -50,7 +50,7 @@ To ensure absolute objectivity, this plugin enforces the **"Identity Purity Prin
 
 ## How to Use
 
-- **Activation**: In OpenClaw, type "启动多模型决策委员会" (Start Multi-Model Consensus Council), "审议这个方案" (Review this plan), "对这个方案进行决策" (Make a decision on this plan), or "启动决策" (Start decision) to activate. On first use, the system will prompt you to enter configuration mode and select the model lineup.
+- **Activation**: In OpenClaw, when the user's input contains 「多模型决策」 or 「多模型委员会」, the Multi-Model Consensus Council activates automatically. On first use, the system will prompt you to enter configuration mode and select the model lineup.
 - **Configuration**: Adjust parameters as needed, such as rounds, threshold, number of members, and member models.
 
 ### Parameter Configuration
@@ -61,7 +61,7 @@ To ensure absolute objectivity, this plugin enforces the **"Identity Purity Prin
 | "改轮数" / "Change rounds" | Decision rounds | Default 3 rounds; 2 for routine tasks; 3-6 for critical decisions |
 | "改阈值" / "Change threshold" | Judgment thresholds | **Pass threshold**: default ≥90%; **Pending threshold**: default [72%, 90%); **Reject threshold**: default <72% |
 | "改判定方式" / "Change judgment method" | Judgment method | **Unanimous-pass (default)**: all judges must meet threshold; Average-pass: average score meets threshold; Majority-pass: more than half meet threshold |
-| "收敛分差阈值" / "Convergence threshold" | Score convergence threshold | Default 5 points; triggers next round when max score spread exceeds this value |
+| ~~"收敛分差阈值"~~ / ~~"Convergence threshold"~~ | ~~Score convergence threshold~~ | ~~Deprecated — replaced by decision-point pass logic~~ |
 | "增加委员" / "Add member" | Committee size | Increase number of committee members |
 | "减少委员" / "Remove member" | Committee size | Decrease number of committee members |
 | "确认配置" / "Confirm config" | Confirm current config | Confirm current parameters and begin decision |
@@ -109,23 +109,30 @@ The Multi-Model Consensus Council adopts a 3-round convergence mechanism, with e
 
 ---
 
-### Round 2: Consensus Sync
+### Convergence Rounds (All rounds except the final round)
 
-**Action**: The organizer summarizes and finalizes all results agreed upon by the full committee — no further discussion on those points. Extracts all unresolved points from Round 1 and organizes them into a "dispute list" and "optimization suggestions," redistributing to all committee members for re-evaluation and re-stance on each dispute point, ultimately producing Round 2 decision results.
+**Action**: The organizer summarizes and finalizes all results agreed upon by the full committee — no further discussion on those points. Extracts all unresolved points from the previous round (items below threshold), organizes them into a "dispute list," redistributing to all committee members for re-evaluation and re-stance **only on these unresolved items**, ultimately producing this round's decision results.
 
 **Review Duration**: No more than 3 minutes per round. If not all sub-sessions are recovered after 3 minutes, the organizer terminates the process and returns results.
 
-**Core Output**: Disputes largely converge, producing Round 2 decision results. **If all committee members approve the decision (no new dispute points), skip Round 3 and directly output the final report.** If disputes remain, proceed to Round 3.
+**Core Output**: Disputes largely converge, producing this round's decision results. **If all committee members approve the decision (no new dispute points), skip the next round and output the final report.** If disputes remain, proceed to the next convergence round.
 
 ---
 
-### Round 3: Final Duel
+### Final Round: Final Duel
 
-**Action**: The organizer summarizes and finalizes all results agreed upon by the full committee — no further discussion on those points. For the few "deep conflicts" that cannot be aligned through discussion, the organizer redistributes to all committee members for re-evaluation and re-stance, ultimately producing the final decision results.
+**Special Note**: Regardless of how many rounds are configured, the Final Duel is **always the last round**.
+- 3-round config: Round 3 is the Final Duel
+- 5-round config: Round 5 is the Final Duel
+- N-round config: Round N is the Final Duel
+
+**Action**: After multiple convergence rounds, if deep conflicts remain unresolved, this round is activated. The organizer redistributes these "deep conflict points" to all committee members, simplified into binary options — "Yes/No" or "Option A/Option B" — and requires all committee members to make their final logical stance.
+
+**Pass Condition**: **Consensus Selection** — all judges have identical recommendation order = pass; threshold is NOT a hard requirement.
 
 **Review Duration**: No more than 3 minutes per round. If not all sub-sessions are recovered after 3 minutes, the organizer terminates the process and returns results.
 
-**Core Output**: Disputes largely converge, producing the final decision results. If disputes remain, they are simplified to binary对立 options — "Yes/No" or "Option A/Option B" — and all committee members make their final logical stance. Generates the final quantitative voting matrix and automatically produces a 6-section standard decision report.
+**Core Output**: Produces the final decision results. Generates the final quantitative voting matrix and automatically produces a 6-section standard decision report.
 
 ---
 
@@ -195,6 +202,8 @@ Three configurable judgment methods (default: unanimous-pass):
 | V1.5.0 | 2026-04-25 | 同步所有文档版本号至V1.5.0；英文内容全量对齐中文 |
 | V1.5.1 | 2026-04-26 | 新增「每轮开始前通知用户」规则；新增「收敛分差阈值」可配置参数；新增「异常处理规则」章节 |
 | V1.5.2 | 2026-04-26 | 新增「判定方式」可配置参数，明确全票通过制为默认判定规则 |
+| **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
+| **V1.6.3** | **2026-04-28** | **触发词精确化**：触发条件由长句改为精确词组「多模型决策」「多模型委员会」；**webchat 中间输出适配**：每轮结束后立即向用户展示本轮汇总，不再等待全部轮次结束后统一输出；同步更新所有文档 |
 
 ---
 
@@ -220,13 +229,13 @@ Three configurable judgment methods (default: unanimous-pass):
 - **角色透明化**：决策委员会成员均会注明其身份（大模型名称），保持可视化透明。
 - **严禁设定角色**：禁止给委员设定诸如"架构师"、"审计员"等身份标签。
 - **严禁引导提示**：任务下发时不得针对评审委员设置诱导性提示词或诱导性身份角色，防止产生的偏见。
-- **结论收敛原则**：若决策委员会成员根据判断自行调用了子Agent，则必须在本轮结束前收敛子汇总Agent的结果，再向组织者输出最终结果。
+- **结论统一原则**：若决策委员会成员根据判断自行调用了子Agent，则必须在本轮结束前汇总子Agent的结果，形成统一结论，再向组织者输出最终结果。
 - **评审不重复原则**：若组织者（即当前使用模型）是评审委员会成员，则组织者提交内容即视同为其在本轮的评审结果，无需重复自评。若组织者不是评审委员会成员，则仅负责组织实施和汇总评委意见，不参与评审。
 
 ---
 
 ## 使用方法
--  **启动**：在OpenClaw中，输入指令"启动多模型决策委员会"、"审议这个方案"、"对这个方案进行决策"、"启动决策"即可启动多模型决策委员会。首次使用时会提醒用户进入配置模式，并选择模型组合。
+-  **启动**：在OpenClaw中，当用户输入的内容包含「多模型决策」或「多模型委员会」时，自动激活多模型决策委员会。首次使用时会提醒用户进入配置模式，并选择模型组合。
 - **配置**：根据需要，可配置参数，如：轮数、阈值、委员数量、委员模型等。
 
 ### 参数配置
@@ -237,7 +246,7 @@ Three configurable judgment methods (default: unanimous-pass):
 | "改轮数" | 决策轮数 | 默认3轮，日常事务可设为2轮，重大决策可设3-6轮 |
 | "改阈值" | 判定阈值 | **通过阈值**：默认≥90%；**待决策阈值**：默认[72%, 90%)；**否定阈值**：默认<72% |
 | "改判定方式" | 判定方式 | **全票通过（默认）**：所有评委均需≥阈值；均分通过：评委均分≥阈值；多数票通过：超过半数评委≥阈值 |
-| "收敛分差阈值" | 收敛分差阈值 | 默认5分；最高分与最低分差距超过此值时自动触发下一轮 |
+| ~~"收敛分差阈值"~~ | ~~收敛分差阈值~~ | ~~已废弃~~ |
 | "增加委员" / "减少委员" | 委员数量 | 支持2-6个模型同时评审 |
 | "确认配置" | 确认当前配置 | 确认当前参数后开始决策 |
 
@@ -250,21 +259,31 @@ Three configurable judgment methods (default: unanimous-pass):
 
 ---
 
-## 决策流程（3轮收敛机制）
-多模型决策委员会采用 3 轮收敛机制，每轮进行100分制评分，最终给出决策结果。具体流程如下：
+## 决策流程（3轮决策机制）
+多模型决策委员会采用 3 轮决策机制，基于决策点级别评审，每轮进行100分制评分，最终给出决策结果。具体流程如下：
 
 ---
 
-### 第 0 轮：准备阶段 (Preparation)
-**决策准备**：组织者（当前使用模型）接收到决策任务后，将用户背景、需求、待审方案汇总后发起决策申请。内容格式为：
+### 第 0 轮：准备与框架确认 (Preparation & Framework Confirmation)
+**决策准备**：组织者（当前使用模型）接收到决策任务后，将用户背景、需求、待审方案汇总，判断评审方案类型，发起决策申请。内容格式为：
 - **项目名称**：{项目名称}
 - **项目背景**：{项目背景}
 - **项目需求**：{项目需求}
 - **待审方案**：{待审方案}
+- **评审方案类型**：{单方案评审 / 二选一评审 / 决策点拆分评审}
+- **决策点拆分及权重**（仅决策点拆分评审时填写）：
+  - 决策点1（{维度名称}）：{权重}%
+  - 决策点2（{维度名称}）：{权重}%
+  - ……
 - **决策成员**：{决策成员：调取已配置的模型组合}
 - **决策轮次**：{决策轮次：调取已配置的轮数}
 - **阈值设置**：{阈值设置：调取已配置的阈值}
-- **提交决策**：{提交用户是否开始决策}
+- **提交决策**：{用户确认评审类型及配置后开始决策}
+
+**评审方案类型**（由组织者根据方案复杂程度判断）：
+- **单方案评审**：简单/日常方案，评委直接对整体方案打分（0-100分制）
+- **二选一评审**：提供方案A和方案B两套完整方案，评委先选择其中一个方案（落选方案直接PASS），再对选中方案的每个决策点逐项打分（0-100分制），加权平均计算总分
+- **决策点拆分评审**：复杂/多维度方案，组织者将方案拆解为若干「决策点」，每个决策点对应一个具体评审维度。评委对每个决策点逐项打分（0-100分制）。整体方案得分为各决策点评分的加权平均值，由组织者自动计算，不再由评委单独打分
 
 ---
 
@@ -280,23 +299,28 @@ Three configurable judgment methods (default: unanimous-pass):
 
 ---
 
-### 第 2 轮：收敛讨论 (Consensus Sync)
+### 第 2 轮：分歧讨论 (Dispute Discussion)
 
-**动作说明**：组织者汇总总结，对全体委员讨论通过的结果进行封存，不再讨论。提取第一轮中所有未通过的点，整理为"争议清单"以及"优化建议"，再次下发给所有委员，要求评委讨论并重新评价该论点，最终产出第二轮决策结果。
+**动作说明**：组织者将第1轮中标记为「未通过」的决策点整理为「未通过决策点清单」，仅将这些未通过项下发给所有委员，要求评委**只针对这些未通过决策点**进行讨论并重新评分。已通过的决策点不再讨论。
 
 **评审时长**：不超过3分钟/轮。若3分钟仍未回收所有子会话，组织者将结束流程并返回结果。
 
-**核心产出**：争议大范围收敛，产出第二轮决策结果。若所有委员均通过决策（无新分歧点），**跳过第3轮，直接输出最终报告**。若仍然存在分歧点，参照第2轮收敛讨论，继续进行第三轮收敛讨论。
+**核心产出**：汇总本轮重新评分结果，若所有决策点全员通过则直接输出最终报告；若仍有未通过项则进入下一轮。
 
 ---
 
-### 第 3 轮：最终辩论 (Final Duel)
+### 最后一轮：最终辩论 (Final Duel)
 
-**动作说明**：组织者汇总总结，对全体委员讨论通过的结果进行封存，不再讨论。针对极少数无法通过讨论对齐的"深层冲突点"，再次下发给所有委员，要求评委讨论并重新评价该论点，最终产出最终决策结果。
+**特殊说明**：无论配置多少轮，最终辩论始终是**最后一轮**。
+- 3轮配置：第3轮为最终辩论
+- 5轮配置：第5轮为最终辩论
+- N轮配置：第N轮为最终辩论
+
+**动作说明**：经过分歧讨论后，仍有决策点未通过时启用。组织者将仍未通过的决策点再次下发给所有委员，要求评委进行最后一轮讨论和重新评分。
 
 **评审时长**：不超过3分钟/轮。若3分钟仍未回收所有子会话，组织者将结束流程并返回结果。
 
-**核心产出**：争议大范围收敛，产出最终决策结果。若仍然存在分歧点，按照简化为"是/否"或"路径A/路径B"的对立选项，要求所有委员进行最后一轮逻辑立场表态。生成最终量化投票矩阵，并自动生成 6 段式标准决策报告。
+**核心产出**：若所有决策点全员通过，输出最终报告；若仍有未通过项，将未通过项标注状态后输出最终报告。
 
 ---
 
@@ -304,7 +328,7 @@ Three configurable judgment methods (default: unanimous-pass):
 
 | 扩展类型 | 说明 |
 |:---|:---|
-| 增加轮次（4轮及以上） | 第4轮参照"收敛讨论"循环收敛，第5轮参照"最终辩论"输出投票矩阵，以此类推 |
+| 增加轮次（4轮及以上） | 倒数第2轮参照「分歧讨论」；最后一轮参照「最终辩论」；中间轮次循环分歧讨论 |
 | 减少轮次（2轮） | 第1轮参照"独立评估"，第2轮直接输出最终报告 |
 
 ---
@@ -313,12 +337,20 @@ Three configurable judgment methods (default: unanimous-pass):
 
 决策完成后，输出标准化报告，包含：
 
-1. **投票记录** — 量化评分矩阵
+1. **投票记录** — 量化评分矩阵（含决策点级别评分）
 2. **汇总说明** — 各委员核心论点（注明大模型）
 3. **执行方案** — 结论版 + 说明版
-4. **未决清单** — 待确认事项与负责人
+4. **决策点通过清单** — 各决策点通过状态
 5. **结论摘要** — 一句话裁定 + 置信度
 6. **风险提示** — 主要风险与缓解建议
+
+**决策点通过状态标注**：
+
+| 状态 | 含义 | 标注 |
+|:---|:---|:---|
+| 全员通过 | 所有评委在该决策点评分均≥阈值 | ✅ 绿色 — 通过 |
+| 待决策 | 推荐顺序一致但有评委评分低于阈值 | 🟡 黄色 — 待用户确认 |
+| 有分歧 | 推荐顺序不一致 | 🔴 红色 — 有分歧，附原因 |
 
 ---
 
@@ -338,9 +370,9 @@ Three configurable judgment methods (default: unanimous-pass):
 
 - **超时**：3分钟内未回收所有子会话，组织者终止并返回已收集结果
 - **模型故障**：评委模型无响应时，标记为"未响应"，以已收集结果继续进行
-- **分差触发**：最高分与最低分差距超过收敛分差阈值时，自动触发下一轮
+- **超时处理**：3分钟内未回收所有子会话，标记超时评委，以已返回结果继续汇总
 
 ---
-*版本: V1.5.2*
+*版本: V1.6.3*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*

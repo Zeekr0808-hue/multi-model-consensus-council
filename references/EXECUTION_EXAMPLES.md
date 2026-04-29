@@ -79,7 +79,7 @@ for model_info in selected_models:
 
 ---
 
-## Step 3：汇总第1轮结果，判断收敛性
+## Step 3：汇总第1轮结果，判断全员通过
 
 **Agent 执行**：
 ```python
@@ -89,51 +89,51 @@ for model_info in selected_models:
     history = sessions_history(f"mmc_r1_{model_info['id']}")
     results_r1.append(extract_review_result(history))
 
-# 提取分歧点
-disputes = extract_disputes(results_r1)
+# 提取未通过决策点
+unresolved = extract_unresolved_decision_points(results_r1, threshold=90)
 
-# 判断收敛性：若全票推荐顺序一致，跳过 Round 2 和 Round 3
-if is_converged(results_r1):
+# 判断全员通过：所有评委在所有决策点上的评分均≥阈值
+if is_full_pass(results_r1, threshold=90):
     generate_final_report(results_r1)  # 直接输出6段式报告
 else:
-    proceed_to_round2(disputes)
+    proceed_to_round2(unresolved)
 ```
 
 ---
 
-## Step 4：第2轮 — 收敛讨论（仅在有分歧时执行）
+## Step 4：第2轮 — 分歧讨论（仅在有未通过决策点时执行）
 
 **Agent 执行**：
 ```python
 # 从 OUTPUT_TEMPLATE.md 加载第2轮 Prompt 模板
-prompt_r2 = load_template("references/OUTPUT_TEMPLATE.md", "第2轮收敛讨论")
+prompt_r2 = load_template("references/OUTPUT_TEMPLATE.md", "第2轮分歧讨论")
 
 for model_info in selected_models:
     spawn(
         model=model_info["id"],
         prompt=prompt_r2.format(
             round1_results=results_r1,
-            disputes=disputes
+            unresolved_decision_points=unresolved
         ),
         session_label=f"mmc_r2_{model_info['id']}"
     )
 ```
 
-**收敛判定**：若第2轮全票收敛 → 跳过 Round 3，直接生成最终报告
+**通过判定**：若第2轮所有未通过决策点均达到全员通过 → 直接生成最终报告
 
 ---
 
-## Step 5：第3轮 — 最终辩论（仅在第2轮仍有分歧时执行）
+## Step 5：最后一轮 — 最终辩论（仅在第2轮后仍有未通过决策点时执行）
 
 **Agent 执行**：
 ```python
-prompt_r3 = load_template("references/OUTPUT_TEMPLATE.md", "第3轮最终辩论")
+prompt_final = load_template("references/OUTPUT_TEMPLATE.md", "最后一轮最终辩论")
 
 for model_info in selected_models:
     spawn(
         model=model_info["id"],
-        prompt=prompt_r3.format(remaining_disputes=remaining_disputes),
-        session_label=f"mmc_r3_{model_info['id']}"
+        prompt=prompt_final.format(remaining_disputes=remaining_disputes),
+        session_label=f"mmc_final_{model_info['id']}"
     )
 ```
 
@@ -147,10 +147,11 @@ for model_info in selected_models:
 all_results = {
     "round1": results_r1,
     "round2": results_r2 if has_round2 else None,
-    "round3": results_r3 if has_round3 else None,
-    "convergence": {
-        "r2_converged": is_converged(results_r2) if has_round2 else True,
-        "skipped_r3": is_converged(results_r2) if has_round2 else False
+    "final_round": results_final if has_final_round else None,
+    "decision_points": {
+        "unresolved_r1": unresolved,
+        "unresolved_r2": extract_unresolved_decision_points(results_r2, threshold=90) if has_round2 else [],
+        "final_pass": is_full_pass(results_r2, threshold=90) if has_round2 else is_full_pass(results_r1, threshold=90)
     }
 }
 

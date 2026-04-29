@@ -17,6 +17,9 @@
 | V1.5.0 | 2026-04-25 | Sync all document versions to V1.5.0; renamed SCHEMA.md; full English content aligned with Chinese |
 | V1.5.1 | 2026-04-26 | Added round-start user notification rule; added convergence score threshold parameter; added exception handling rules section |
 | V1.5.2 | 2026-04-26 | Added judgment method configurable parameter; clarified unanimous-pass rule as default |
+| **V1.6.0** | **2026-04-27** | **MAJOR FIX**: Rewrote sub-agent result recovery; added runtime environment adaptation matrix; Push-based waiting flow; runtime self-check; simplified state management; added TROUBLESHOOTING.md |
+| **V1.6.1** | **2026-04-27** | **Clarified judgment rules**: Separated "Pass" vs "Convergence" vs "Consensus Selection"; clarified convergence discussion scope; renamed "Round 3" to "Final Round"; added Consensus Selection for final round |
+| **V1.6.2** | **2026-04-27** | **Core logic refactored**: Removed "Convergence"; introduced "Decision Point" level review; "Convergence Discussion" renamed to "Dispute Discussion"; final report includes decision point status (✅/🟡/🔴) |
 
 ---
 
@@ -43,7 +46,7 @@ To ensure absolute objectivity, this plugin enforces the **"Identity Purity Prin
 - **Identity Transparency**: All committee members are identified by their model name (e.g., Kimi K2.6, GPT-5.4), maintaining visual transparency.
 - **No Role Assignment**: Committee members are forbidden from having preset roles such as "architect" or "auditor".
 - **No Biased Prompting**: Tasks must not include inducing prompts or identity roles targeted at committee members, preventing bias from prompt engineering.
-- **Conclusion Convergence Principle**: If a committee member calls a sub-agent based on their own judgment, they must converge the sub-agent's output within the same round before submitting their final conclusion to the organizer.
+- **No Sub-Agent Delegation**: Judges are strictly prohibited from spawning sub-agents. They must think independently and output their own conclusions. Complex tasks are decomposed and distributed by the organizer.
 - **No Duplicate Review Principle**: If the organizer (the current model in use) is a committee member, their submitted content counts as their Round 1 review result — no duplicate self-review is required. If the organizer is not a committee member, they are responsible only for organizing and summarizing; they do not participate in the review.
 
 ---
@@ -107,23 +110,28 @@ The Multi-Model Consensus Council adopts a 3-round convergence mechanism, with e
 
 ---
 
-### Round 2: Consensus Sync
+### Round 2: Dispute Discussion
 
-**Action**: The organizer summarizes and finalizes all results agreed upon by the full committee — no further discussion on those points. Extracts all unresolved points from Round 1 and organizes them into a "dispute list" and "optimization suggestions," redistributing to all committee members for re-evaluation and re-stance on each dispute point, ultimately producing Round 2 decision results.
+**Action**: The organizer extracts all decision points that did NOT achieve full pass in Round 1 (any judge scoring below threshold) and compiles them into an "unresolved decision points list." These unresolved points only are redistributed to all committee members for re-discussion and re-scoring. Points already with full pass are frozen and not re-discussed.
 
 **Review Duration**: No more than 3 minutes per round. If not all sub-sessions are recovered after 3 minutes, the organizer terminates the process and returns results.
 
-**Core Output**: Disputes largely converge, producing Round 2 decision results. **If all committee members approve the decision (no new dispute points), skip Round 3 and directly output the final report.** If disputes remain, proceed to Round 3.
+**Core Output**: Summarizes re-scoring results. If all previously unresolved points now achieve full pass, output the final report. If any remain unresolved, proceed to the final round.
 
 ---
 
-### Round 3: Final Duel
+### Final Round: Final Duel
 
-**Action**: The organizer summarizes and finalizes all results agreed upon by the full committee — no further discussion on those points. For the few "deep conflicts" that cannot be aligned through discussion, the organizer redistributes to all committee members for re-evaluation and re-stance, ultimately producing the final decision results.
+**Special Note**: Regardless of how many rounds are configured, the Final Duel is **always the last round**.
+- 3-round config: Round 3 is the Final Duel
+- 5-round config: Round 5 is the Final Duel
+- N-round config: Round N is the Final Duel
+
+**Action**: After dispute discussion, if any decision points still have judges scoring below threshold, those unresolved points are redistributed to all committee members for a final round of discussion and re-scoring.
 
 **Review Duration**: No more than 3 minutes per round. If not all sub-sessions are recovered after 3 minutes, the organizer terminates the process and returns results.
 
-**Core Output**: Disputes largely converge, producing the final decision results. If disputes remain, they are simplified to binary对立 options — "Yes/No" or "Option A/Option B" — and all committee members make their final logical stance. Generates the final quantitative voting matrix and automatically produces a 6-section standard decision report.
+**Core Output**: If all decision points now achieve full pass, output the final report. If any remain unresolved, output the final report with each decision point's status tagged: ✅ Full Pass / 🟡 Pending User Decision / 🔴 Disputed.
 
 ---
 
@@ -131,8 +139,8 @@ The Multi-Model Consensus Council adopts a 3-round convergence mechanism, with e
 
 | Extension Type | Description |
 |:---|:---|
-| Increase rounds (4 or more) | Round 4 follows "Consensus Sync"; Round 5 follows "Final Duel"; and so on |
-| Decrease rounds (2 rounds) | Round 1 follows "Independent Evaluation"; Round 2 directly outputs the final report |
+| Increase rounds (4 or more) | 2nd-to-last round follows "Dispute Discussion"; last round follows "Final Duel"; middle rounds loop dispute discussion |
+| Decrease rounds (2 rounds) | Round 1 follows "Independent Evaluation"; Round 2 directly outputs the final report (treated as final round) |
 
 ---
 
@@ -140,15 +148,22 @@ The Multi-Model Consensus Council adopts a 3-round convergence mechanism, with e
 
 The decision output is a standardized report containing:
 
-1. **Voting Record** — Quantitative scoring matrix
+1. **Voting Record** — Quantitative scoring matrix (by decision point)
 2. **Summary** — Each committee member's core arguments (with model name noted)
 3. **Execution Plan** — Conclusion version + detailed version
-4. **Unresolved List** — Pending items and responsible parties
+4. **Decision Point Status** — Each decision point's pass status
 5. **Conclusion Summary** — One-sentence verdict + confidence level
 6. **Risk Advisory** — Key risks and mitigation recommendations
 
+**Decision Point Status Tags**:
+| Status | Meaning | Tag |
+|:---|:---|:---|
+| Full Pass | All judges scored ≥ threshold on this point | ✅ Green — Passed |
+| Pending Decision | All judges chose same option but some scores below threshold | 🟡 Yellow — Pending User Confirmation |
+| Disputed | Judges chose different options | 🔴 Red — Disputed, reason noted |
+
 ---
-*Version: V1.5.2*
+*Version: V1.6.2*
 *Developer: Zeekr0808*
 *Email: Zeekr0808@outlook.com*
 
@@ -173,6 +188,9 @@ The decision output is a standardized report containing:
 | V1.5.0 | 2026-04-25 | 同步所有文档版本号至V1.5.0；英文内容全量对齐中文 |
 | V1.5.1 | 2026-04-26 | 新增「每轮开始前通知用户」规则；新增「收敛分差阈值」可配置参数；新增「异常处理规则」章节 |
 | V1.5.2 | 2026-04-26 | 新增「判定方式」可配置参数，明确全票通过制为默认判定规则 |
+| **V1.6.0** | **2026-04-27** | **重大修复**：重写子Agent结果回收机制，新增运行时环境适配矩阵；新增Push-based等待流程；新增运行时自检；简化状态管理；新增TROUBLESHOOTING.md |
+| **V1.6.1** | **2026-04-27** | **判定规则澄清**：区分「通过」「收敛」「一致性选择」三个独立概念；澄清收敛讨论范围；「第3轮」更名为「最后一轮」；新增最终轮「一致性选择」机制 |
+| **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
 
 ---
 
@@ -198,7 +216,7 @@ The decision output is a standardized report containing:
 - **角色透明化**：决策委员会成员均会注明其身份（大模型名称），保持可视化透明。
 - **严禁设定角色**：禁止给委员设定诸如"架构师"、"审计员"等身份标签。
 - **严禁引导提示**：任务下发时不得针对评审委员设置诱导性提示词或诱导性身份角色，防止产生的偏见。
-- **结论收敛原则**：若决策委员会成员根据判断自行调用了子Agent，则必须在本轮结束前收敛子汇总Agent的结果，再向组织者输出最终结果。
+- **严禁子Agent委托**：评委严禁spawn任何子Agent，只能独立思考和输出结论；禁止二次委托，所有子任务由组织者统一分发和回收，确保链路完全可控。
 - **评审不重复原则**：若组织者（即当前使用模型）是评审委员会成员，则组织者提交内容即视同为其在本轮的评审结果，无需重复自评。若组织者不是评审委员会成员，则仅负责组织实施和汇总评委意见，不参与评审。
 
 ---
@@ -226,21 +244,31 @@ The decision output is a standardized report containing:
 
 ---
 
-## 决策流程（3轮收敛机制）
-多模型决策委员会采用 3 轮收敛机制，每轮进行100分制评分，最终给出决策结果。具体流程如下：
+## 决策流程（3轮决策机制）
+多模型决策委员会采用 3 轮决策机制，基于决策点级别评审，每轮进行100分制评分，最终给出决策结果。具体流程如下：
 
 ---
 
-### 第 0 轮：准备阶段 (Preparation)
-**决策准备**：组织者（当前使用模型）接收到决策任务后，将用户背景、需求、待审方案汇总后发起决策申请。内容格式为：
+### 第 0 轮：准备与框架确认 (Preparation & Framework Confirmation)
+**决策准备**：组织者（当前使用模型）接收到决策任务后，将用户背景、需求、待审方案汇总，判断评审方案类型，发起决策申请。内容格式为：
 - **项目名称**：{项目名称}
 - **项目背景**：{项目背景}
 - **项目需求**：{项目需求}
 - **待审方案**：{待审方案}
+- **评审方案类型**：{单方案评审 / 二选一评审 / 决策点拆分评审}
+- **决策点拆分及权重**（仅决策点拆分评审时填写）：
+  - 决策点1（{维度名称}）：{权重}%
+  - 决策点2（{维度名称}）：{权重}%
+  - ……
 - **决策成员**：{决策成员：调取已配置的模型组合}
 - **决策轮次**：{决策轮次：调取已配置的轮数}
 - **阈值设置**：{阈值设置：调取已配置的阈值}
-- **提交决策**：{提交用户是否开始决策}
+- **提交决策**：{用户确认评审类型及配置后开始决策}
+
+**评审方案类型**（由组织者根据方案复杂程度判断）：
+- **单方案评审**：简单/日常方案，评委直接对整体方案打分（0-100分制）
+- **二选一评审**：提供方案A和方案B两套完整方案，评委先选择其中一个方案（落选方案直接PASS），再对选中方案的每个决策点逐项打分（0-100分制），加权平均计算总分
+- **决策点拆分评审**：复杂/多维度方案，组织者将方案拆解为若干「决策点」，每个决策点对应一个具体评审维度。评委对每个决策点逐项打分（0-100分制）。整体方案得分为各决策点评分的加权平均值，由组织者自动计算，不再由评委单独打分
 
 ---
 
@@ -256,23 +284,28 @@ The decision output is a standardized report containing:
 
 ---
 
-### 第 2 轮：收敛讨论 (Consensus Sync)
+### 第 2 轮：分歧讨论 (Dispute Discussion)
 
-**动作说明**：组织者汇总总结，对全体委员讨论通过的结果进行封存，不再讨论。提取第一轮中所有未通过的点，整理为"争议清单"以及"优化建议"，再次下发给所有委员，要求评委讨论并重新评价该论点，最终产出第二轮决策结果。
+**动作说明**：组织者将第1轮中标记为「未通过」的决策点整理为「未通过决策点清单」，仅将这些未通过项下发给所有委员，要求评委**只针对这些未通过决策点**进行讨论并重新评分。已通过的决策点不再讨论。
 
 **评审时长**：不超过3分钟/轮。若3分钟仍未回收所有子会话，组织者将结束流程并返回结果。
 
-**核心产出**：争议大范围收敛，产出第二轮决策结果。若所有委员均通过决策（无新分歧点），**跳过第3轮，直接输出最终报告**。若仍然存在分歧点，参照第2轮收敛讨论，继续进行第三轮收敛讨论。
+**核心产出**：汇总本轮重新评分结果，若所有决策点全员通过则直接输出最终报告；若仍有未通过项则进入下一轮。
 
 ---
 
-### 第 3 轮：最终辩论 (Final Duel)
+### 最后一轮：最终辩论 (Final Duel)
 
-**动作说明**：组织者汇总总结，对全体委员讨论通过的结果进行封存，不再讨论。针对极少数无法通过讨论对齐的"深层冲突点"，再次下发给所有委员，要求评委讨论并重新评价该论点，最终产出最终决策结果。
+**特殊说明**：无论配置多少轮，最终辩论始终是**最后一轮**。
+- 3轮配置：第3轮为最终辩论
+- 5轮配置：第5轮为最终辩论
+- N轮配置：第N轮为最终辩论
+
+**动作说明**：经过分歧讨论后，仍有决策点未通过时启用。组织者将仍未通过的决策点再次下发给所有委员，要求评委进行最后一轮讨论和重新评分。
 
 **评审时长**：不超过3分钟/轮。若3分钟仍未回收所有子会话，组织者将结束流程并返回结果。
 
-**核心产出**：争议大范围收敛，产出最终决策结果。若仍然存在分歧点，按照简化为"是/否"或"路径A/路径B"的对立选项，要求所有委员进行最后一轮逻辑立场表态。生成最终量化投票矩阵，并自动生成 6 段式标准决策报告。
+**核心产出**：若所有决策点全员通过，输出最终报告；若仍有未通过项，将未通过项标注状态后输出最终报告。
 
 ---
 
@@ -280,7 +313,7 @@ The decision output is a standardized report containing:
 
 | 扩展类型 | 说明 |
 |:---|:---|
-| 增加轮次（4轮及以上） | 第4轮参照"收敛讨论"循环收敛，第5轮参照"最终辩论"输出投票矩阵，以此类推 |
+| 增加轮次（4轮及以上） | 倒数第2轮参照「分歧讨论」；最后一轮参照「最终辩论」；中间轮次循环分歧讨论 |
 | 减少轮次（2轮） | 第1轮参照"独立评估"，第2轮直接输出最终报告 |
 
 ---
@@ -289,14 +322,22 @@ The decision output is a standardized report containing:
 
 决策完成后，输出标准化报告，包含：
 
-1. **投票记录** — 量化评分矩阵
+1. **投票记录** — 量化评分矩阵（含决策点级别评分）
 2. **汇总说明** — 各委员核心论点（注明大模型）
 3. **执行方案** — 结论版 + 说明版
-4. **未决清单** — 待确认事项与负责人
+4. **决策点通过清单** — 各决策点通过状态
 5. **结论摘要** — 一句话裁定 + 置信度
 6. **风险提示** — 主要风险与缓解建议
 
+**决策点通过状态标注**：
+
+| 状态 | 含义 | 标注 |
+|:---|:---|:---|
+| 全员通过 | 所有评委在该决策点评分均≥阈值 | ✅ 绿色 — 通过 |
+| 待决策 | 推荐顺序一致但有评委评分低于阈值 | 🟡 黄色 — 待用户确认 |
+| 有分歧 | 推荐顺序不一致 | 🔴 红色 — 有分歧，附原因 |
+
 ---
-*版本: V1.5.2*
+*版本: V1.6.2*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*
