@@ -5,7 +5,7 @@ allowed-tools: SessionsSpawn,SessionsSend,SessionsHistory,Read,Write,Exec
 metadata:
   openclaw:
     emoji: "🏛️"
-    version: "1.6.3"
+    version: "1.6.4"
     requires:
       capability: sessions_spawn
 ---
