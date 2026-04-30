@@ -20,6 +20,7 @@
 | **V1.6.0** | **2026-04-27** | **MAJOR FIX**: Rewrote sub-agent result recovery; added runtime environment adaptation matrix; Push-based waiting flow; runtime self-check; simplified state management; added TROUBLESHOOTING.md |
 | **V1.6.1** | **2026-04-27** | **Clarified judgment rules**: Separated "Pass" vs "Convergence" vs "Consensus Selection"; clarified convergence discussion scope; renamed "Round 3" to "Final Round"; added Consensus Selection for final round |
 | **V1.6.2** | **2026-04-27** | **Core logic refactored**: Removed "Convergence"; introduced "Decision Point" level review; "Convergence Discussion" renamed to "Dispute Discussion"; final report includes decision point status (✅/🟡/🔴) |
+| **V1.6.5** | **2026-04-30** | **Security Hardening**: Removed unused `Exec` from allowed-tools; reduced max concurrent sub-agents from 13 to 6; added `Write` tool path restriction (memory directory only); added model-routing early termination rule in TROUBLESHOOTING.md |
 
 ---
 
@@ -163,7 +164,7 @@ The decision output is a standardized report containing:
 | Disputed | Judges chose different options | 🔴 Red — Disputed, reason noted |
 
 ---
-*Version: V1.6.2*
+*Version: V1.6.5*
 *Developer: Zeekr0808*
 *Email: Zeekr0808@outlook.com*
 
@@ -191,6 +192,7 @@ The decision output is a standardized report containing:
 | **V1.6.0** | **2026-04-27** | **重大修复**：重写子Agent结果回收机制，新增运行时环境适配矩阵；新增Push-based等待流程；新增运行时自检；简化状态管理；新增TROUBLESHOOTING.md |
 | **V1.6.1** | **2026-04-27** | **判定规则澄清**：区分「通过」「收敛」「一致性选择」三个独立概念；澄清收敛讨论范围；「第3轮」更名为「最后一轮」；新增最终轮「一致性选择」机制 |
 | **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
+| **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
 
 ---
 
@@ -338,6 +340,6 @@ The decision output is a standardized report containing:
 | 有分歧 | 推荐顺序不一致 | 🔴 红色 — 有分歧，附原因 |
 
 ---
-*版本: V1.6.2*
+*版本: V1.6.5*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*

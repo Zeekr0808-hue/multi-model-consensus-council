@@ -1,11 +1,11 @@
 ---
 name: multi-model-consensus
 description: 多模型决策委员会 — 消除单模型偏见，通过多轮分歧讨论产出客观决策参考。支持3-13个模型同时评审，提供量化投票矩阵和6段式共识报告。触发条件：包含「多模型决策」或「多模型委员会」时自动激活。
-allowed-tools: SessionsSpawn,SessionsSend,SessionsHistory,Read,Write,Exec
+allowed-tools: SessionsSpawn,SessionsSend,SessionsHistory,Read,Write
 metadata:
   openclaw:
     emoji: "🏛️"
-    version: "1.6.4"
+    version: "1.6.5"
     requires:
       capability: sessions_spawn
 ---
@@ -349,8 +349,10 @@ Pending: {N-M} ({评委C} ⏳)
 
 ## 技术约束
 
+- `Write` 工具仅限写入 `~/.openclaw/workspace/memory/` 目录，禁止写入其他任何路径
+
 - 每个子会话最大执行时间：**120秒**（可通过 `timeoutSeconds` 配置，最大 300 秒）
-- 最大并发子会话数：**13个**
+- 最大并发子会话数：**6个**（与委员数量上限一致）
 - ~~状态文件有效期：**24小时**~~（V1.6.0 起不再使用状态文件，改用会话上下文跟踪）
 - 报告自动归档路径：`~/.openclaw/workspace/memory/MONTHLY/mmd_<date>.md`
 

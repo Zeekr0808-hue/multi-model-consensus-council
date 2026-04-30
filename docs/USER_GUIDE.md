@@ -23,6 +23,7 @@
 | **V1.6.1** | **2026-04-27** | **Clarified judgment rules**: Separated "Pass" vs "Convergence" vs "Consensus Selection"; clarified convergence discussion scope (only unresolved items below threshold); renamed "Round 3" to "Final Round"; added Consensus Selection mechanism for final round |
 | **V1.6.2** | **2026-04-27** | **Core logic refactored**: Removed "Convergence" concept; introduced "Decision Point" level review; changed pass judgment to "Full Pass" vs "Partial Pass"; "Convergence Discussion" renamed to "Dispute Discussion"; final report now includes decision point status (✅ Green/🟡 Yellow/🔴 Red) |
 | **V1.6.3** | **2026-04-28** | **Trigger phrase precision**: Changed trigger from long phrases to exact keywords 「多模型决策」/「多模型委员会」; **webchat intermediate output**: Each round now outputs summary to user immediately instead of waiting until all rounds complete; updated all docs to sync |
+| **V1.6.5** | **2026-04-30** | **Security Hardening**: Removed unused `Exec` from allowed-tools; reduced max concurrent sub-agents from 13 to 6; added `Write` tool path restriction (memory directory only); added model-routing early termination rule in TROUBLESHOOTING.md |
 
 ---
 
@@ -336,7 +337,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 
 ---
 
-*Version: V1.6.3*  
+*Version: V1.6.5*  
 *Developer: Zeekr0808*  
 *Email: Zeekr0808@outlook.com*
 
@@ -369,6 +370,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 | **V1.6.1** | **2026-04-27** | **判定规则澄清**：区分「通过」「收敛」「一致性选择」三个独立概念；澄清收敛讨论范围（仅聊未达标分歧点）；「第3轮」更名为「最后一轮」；新增最终轮「一致性选择」机制 |
 | **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
 | **V1.6.3** | **2026-04-28** | **触发词精确化**：触发条件由长句改为精确词组「多模型决策」「多模型委员会」；**webchat 中间输出适配**：每轮结束后立即向用户展示本轮汇总，不再等待全部轮次结束后统一输出；同步更新所有文档 |
+| **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
 
 ---
 
@@ -687,6 +689,6 @@ Pending: {N-M} ({评委C} ⏳)
 
 ---
 
-*版本: V1.6.3*  
+*版本: V1.6.5*  
 *开发者: Zeekr0808*  
 *邮箱: Zeekr0808@outlook.com*
