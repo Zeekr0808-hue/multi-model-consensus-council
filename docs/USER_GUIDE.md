@@ -8,7 +8,7 @@
 | V1.1.0 | 2026-04-24 | Added English operation guide (merged with Chinese, English first); translation reviewed and approved by multi-model committee (avg 81/100) |
 | V1.1.3 | 2026-04-24 | SKILL.md and references/ converted to pure Chinese for AI readability; docs/ retains full bilingual documentation for global community |
 | V1.2.0 | 2026-04-25 | Restored public ClawHub version; sync all files |
-| V1.2.1 | 2026-04-25 | **CRITICAL FIX**: Removed hardcoded model list; dynamic scan of local `openclaw.json` `models.providers` |
+| V1.2.1 | 2026-04-25 | **CRITICAL FIX**: Removed hardcoded model list; dynamic scan via `openclaw models list` |
 | V1.2.2 | 2026-04-25 | SYNC: Full file sync to GitHub and ClawHub |
 | V1.2.3 | 2026-04-25 | **UX FIX**: Clarify first-time user flow |
 | V1.2.4 | 2026-04-25 | **CRITICAL FIX**: OUTPUT_TEMPLATE.md - remove anonymous committee member format |
@@ -24,6 +24,7 @@
 | **V1.6.2** | **2026-04-27** | **Core logic refactored**: Removed "Convergence" concept; introduced "Decision Point" level review; changed pass judgment to "Full Pass" vs "Partial Pass"; "Convergence Discussion" renamed to "Dispute Discussion"; final report now includes decision point status (✅ Green/🟡 Yellow/🔴 Red) |
 | **V1.6.3** | **2026-04-28** | **Trigger phrase precision**: Changed trigger from long phrases to exact keywords 「多模型决策」/「多模型委员会」; **webchat intermediate output**: Each round now outputs summary to user immediately instead of waiting until all rounds complete; updated all docs to sync |
 | **V1.6.5** | **2026-04-30** | **Security Hardening**: Removed unused `Exec` from allowed-tools; reduced max concurrent sub-agents from 13 to 6; added `Write` tool path restriction (memory directory only); added model-routing early termination rule in TROUBLESHOOTING.md |
+| **V1.6.6** | **2026-04-30** | **Security Fix**: Replaced `openclaw.json` file scan with `openclaw models list` command to avoid exposing provider tokens; corrected committee size description from 3-13 to 3-6 models; added Read/Write tool path whitelist in SKILL.md |
 
 ---
 
@@ -337,7 +338,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 
 ---
 
-*Version: V1.6.5*  
+*Version: V1.6.6*  
 *Developer: Zeekr0808*  
 *Email: Zeekr0808@outlook.com*
 
@@ -355,7 +356,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 | V1.1.0 | 2026-04-24 | **新增英文操作文档**（与中文合并，英文在上）；经多模型委员会翻译质量审核通过（均分81/100） |
 | V1.1.3 | 2026-04-24 | SKILL.md和references/转为纯中文（精简）；docs/保留双语完整文档（面向全球用户） |
 | V1.2.0 | 2026-04-25 | 恢复为公共ClawHub版本；同步所有文件 |
-| V1.2.1 | 2026-04-25 | **关键修复**：删除SKILL.md中硬编码的模型列表；改为执行时动态扫描本地`openclaw.json`的`models.providers` |
+| V1.2.1 | 2026-04-25 | **关键修复**：删除SKILL.md中硬编码的模型列表；改为执行时动态扫描通过`openclaw models list`获取模型列表 |
 | V1.2.2 | 2026-04-25 | 同步：全文件同步到GitHub和ClawHub |
 | V1.2.3 | 2026-04-25 | **用户体验修复**：明确首次使用流程 |
 | V1.2.4 | 2026-04-25 | **关键修复**：OUTPUT_TEMPLATE.md - 删除匿名委员格式 |
@@ -371,6 +372,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 | **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
 | **V1.6.3** | **2026-04-28** | **触发词精确化**：触发条件由长句改为精确词组「多模型决策」「多模型委员会」；**webchat 中间输出适配**：每轮结束后立即向用户展示本轮汇总，不再等待全部轮次结束后统一输出；同步更新所有文档 |
 | **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
+| **V1.6.6** | **2026-04-30** | **安全修复**：将`openclaw.json`文件扫描改为`openclaw models list`命令，避免暴露 provider token；修正委员会规模描述从3-13为3-6个模型；SKILL.md 新增 Read/Write 工具路径白名单声明 |
 
 ---
 
@@ -689,6 +691,6 @@ Pending: {N-M} ({评委C} ⏳)
 
 ---
 
-*版本: V1.6.5*  
+*版本: V1.6.6*  
 *开发者: Zeekr0808*  
 *邮箱: Zeekr0808@outlook.com*

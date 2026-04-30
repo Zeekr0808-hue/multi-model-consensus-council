@@ -1,6 +1,6 @@
 ---
 name: multi-model-consensus
-description: 多模型决策委员会 — 消除单模型偏见，通过多轮分歧讨论产出客观决策参考。支持3-13个模型同时评审，提供量化投票矩阵和6段式共识报告。触发条件：包含「多模型决策」或「多模型委员会」时自动激活。
+description: 多模型决策委员会 — 消除单模型偏见，通过多轮分歧讨论产出客观决策参考。支持3-6个模型同时评审，提供量化投票矩阵和6段式共识报告。触发条件：包含「多模型决策」或「多模型委员会」时自动激活。
 allowed-tools: SessionsSpawn,SessionsSend,SessionsHistory,Read,Write
 metadata:
   openclaw:
@@ -349,7 +349,16 @@ Pending: {N-M} ({评委C} ⏳)
 
 ## 技术约束
 
-- `Write` 工具仅限写入 `~/.openclaw/workspace/memory/` 目录，禁止写入其他任何路径
+### 工具权限范围（安全白名单）
+- `Read` 工具仅限读取以下路径：
+  - skill 目录内文件（SKILL.md、references/、docs/ 等）
+  - `~/.openclaw/workspace/tmp_mmc_*.md`（临时报告文件）
+  - 严禁读取用户主目录下的隐藏文件（`.ssh/`、`.env/`、`.aws/` 等）
+- `Write` 工具仅限写入以下路径：
+  - `~/.openclaw/workspace/memory/` 目录（报告归档）
+  - `~/.openclaw/workspace/tmp_mmc_*.md`（临时报告文件）
+  - `~/Desktop/*`（最终报告输出到桌面）
+  - 禁止写入其他任何路径
 
 - 每个子会话最大执行时间：**120秒**（可通过 `timeoutSeconds` 配置，最大 300 秒）
 - 最大并发子会话数：**6个**（与委员数量上限一致）

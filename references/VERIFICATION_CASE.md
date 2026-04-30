@@ -8,7 +8,7 @@
 
 ## 验证环境
 
-- **本地模型库**：动态扫描 `~/.openclaw/openclaw.json` 中的 `models.providers`
+- **本地模型库**：通过 `openclaw models list` 动态获取可用模型列表
 - **决策轮数**：3轮（默认）
 - **通过阈值**：≥90%
 - **测试任务**：方案A vs 方案B 简单二选一决策
@@ -36,18 +36,17 @@
 
 ```python
 # 验证动态扫描逻辑
-import json
-with open("~/.openclaw/openclaw.json") as f:
-    config = json.load(f)
+import subprocess
 
-providers = config.get("models", {}).get("providers", {})
+result = subprocess.run(["openclaw", "models", "list"], capture_output=True, text=True)
+# 解析输出获取模型列表
 models = []
-for pname, pcfg in providers.items():
-    for m in pcfg.get("models", []):
+for line in result.stdout.strip().split("\n")[1:]:  # 跳过表头
+    parts = line.split()
+    if parts:
         models.append({
-            "provider": pname,
-            "id": m["id"],
-            "name": m.get("name", m["id"])
+            "id": parts[0],
+            "name": parts[0]
         })
 
 assert len(models) >= 3, "本地模型少于3个，无法组成委员会"
