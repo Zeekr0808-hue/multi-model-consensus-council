@@ -22,6 +22,7 @@
 | **V1.6.2** | **2026-04-27** | **Core logic refactored**: Removed "Convergence"; introduced "Decision Point" level review; "Convergence Discussion" renamed to "Dispute Discussion"; final report includes decision point status (✅/🟡/🔴) |
 | **V1.6.5** | **2026-04-30** | **Security Hardening**: Removed unused `Exec` from allowed-tools; reduced max concurrent sub-agents from 13 to 6; added `Write` tool path restriction (memory directory only); added model-routing early termination rule in TROUBLESHOOTING.md |
 | **V1.6.6** | **2026-04-30** | **Security Fix**: Replaced `openclaw.json` file scan with `openclaw models list` command to avoid exposing provider tokens; corrected committee size description from 3-13 to 3-6 models; added Read/Write tool path whitelist in SKILL.md |
+| **V1.6.7** | **2026-04-30** | **Auditability Fix**: Clarified tool usage scope—organizers use Read/Write, judges receive content via task parameter and must not call any tools; removed contradictory "internal-only" markings; eliminated ambiguous judge spawn instructions in OUTPUT_TEMPLATE.md |
 
 ---
 
@@ -165,7 +166,7 @@ The decision output is a standardized report containing:
 | Disputed | Judges chose different options | 🔴 Red — Disputed, reason noted |
 
 ---
-*Version: V1.6.6*
+*Version: V1.6.7*
 *Developer: Zeekr0808*
 *Email: Zeekr0808@outlook.com*
 
@@ -195,6 +196,7 @@ The decision output is a standardized report containing:
 | **V1.6.2** | **2026-04-27** | **核心逻辑重构**：取消「收敛」概念，引入「决策点」级别评审；通过判定改为全员通过/非全员通过；「收敛讨论」改为「分歧讨论」；最终报告新增决策点通过状态标注（✅绿色/🟡黄色/🔴红色） |
 | **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
 | **V1.6.6** | **2026-04-30** | **安全修复**：将`openclaw.json`文件扫描改为`openclaw models list`命令，避免暴露 provider token；修正委员会规模描述从3-13为3-6个模型；SKILL.md 新增 Read/Write 工具路径白名单声明 |
+| **V1.6.7** | **2026-04-30** | **可审计性修复**：明确工具使用分工——组织者使用 Read/Write，评委通过 task 参数接收内容且不得调用任何工具；删除"仅供内部"标记；消除 OUTPUT_TEMPLATE.md 中评委 spawn 的歧义表述 |
 
 ---
 
@@ -342,6 +344,6 @@ The decision output is a standardized report containing:
 | 有分歧 | 推荐顺序不一致 | 🔴 红色 — 有分歧，附原因 |
 
 ---
-*版本: V1.6.6*
+*版本: V1.6.7*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*

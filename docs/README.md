@@ -206,6 +206,7 @@ Three configurable judgment methods (default: unanimous-pass):
 | **V1.6.3** | **2026-04-28** | **触发词精确化**：触发条件由长句改为精确词组「多模型决策」「多模型委员会」；**webchat 中间输出适配**：每轮结束后立即向用户展示本轮汇总，不再等待全部轮次结束后统一输出；同步更新所有文档 |
 | **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
 | **V1.6.6** | **2026-04-30** | **安全修复**：将`openclaw.json`文件扫描改为`openclaw models list`命令，避免暴露 provider token；修正委员会规模描述从3-13为3-6个模型；SKILL.md 新增 Read/Write 工具路径白名单声明 |
+| **V1.6.7** | **2026-04-30** | **可审计性修复**：明确工具使用分工——组织者使用 Read/Write，评委通过 task 参数接收内容且不得调用任何工具；删除"仅供内部"标记；消除 OUTPUT_TEMPLATE.md 中评委 spawn 的歧义表述 |
 
 ---
 
@@ -375,6 +376,6 @@ Three configurable judgment methods (default: unanimous-pass):
 - **超时处理**：3分钟内未回收所有子会话，标记超时评委，以已返回结果继续汇总
 
 ---
-*版本: V1.6.6*
+*版本: V1.6.7*
 *开发者: Zeekr0808*
 *邮箱: Zeekr0808@outlook.com*

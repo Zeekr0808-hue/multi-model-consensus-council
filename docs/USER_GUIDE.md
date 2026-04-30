@@ -25,6 +25,7 @@
 | **V1.6.3** | **2026-04-28** | **Trigger phrase precision**: Changed trigger from long phrases to exact keywords 「多模型决策」/「多模型委员会」; **webchat intermediate output**: Each round now outputs summary to user immediately instead of waiting until all rounds complete; updated all docs to sync |
 | **V1.6.5** | **2026-04-30** | **Security Hardening**: Removed unused `Exec` from allowed-tools; reduced max concurrent sub-agents from 13 to 6; added `Write` tool path restriction (memory directory only); added model-routing early termination rule in TROUBLESHOOTING.md |
 | **V1.6.6** | **2026-04-30** | **Security Fix**: Replaced `openclaw.json` file scan with `openclaw models list` command to avoid exposing provider tokens; corrected committee size description from 3-13 to 3-6 models; added Read/Write tool path whitelist in SKILL.md |
+| **V1.6.7** | **2026-04-30** | **Auditability Fix**: Clarified tool usage scope—organizers use Read/Write, judges receive content via task parameter and must not call any tools; removed contradictory "internal-only" markings; eliminated ambiguous judge spawn instructions in OUTPUT_TEMPLATE.md |
 
 ---
 
@@ -338,7 +339,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 
 ---
 
-*Version: V1.6.6*  
+*Version: V1.6.7*  
 *Developer: Zeekr0808*  
 *Email: Zeekr0808@outlook.com*
 
@@ -373,6 +374,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 | **V1.6.3** | **2026-04-28** | **触发词精确化**：触发条件由长句改为精确词组「多模型决策」「多模型委员会」；**webchat 中间输出适配**：每轮结束后立即向用户展示本轮汇总，不再等待全部轮次结束后统一输出；同步更新所有文档 |
 | **V1.6.5** | **2026-04-30** | **安全加固**：移除 allowed-tools 中未使用的 Exec；最大并发子Agent从13降至6；新增 Write 工具路径限制（仅限 memory 目录）；TROUBLESHOOTING.md 新增模型路由偏差提前终止规则 |
 | **V1.6.6** | **2026-04-30** | **安全修复**：将`openclaw.json`文件扫描改为`openclaw models list`命令，避免暴露 provider token；修正委员会规模描述从3-13为3-6个模型；SKILL.md 新增 Read/Write 工具路径白名单声明 |
+| **V1.6.7** | **2026-04-30** | **可审计性修复**：明确工具使用分工——组织者使用 Read/Write，评委通过 task 参数接收内容且不得调用任何工具；删除"仅供内部"标记；消除 OUTPUT_TEMPLATE.md 中评委 spawn 的歧义表述 |
 
 ---
 
@@ -398,7 +400,7 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 - **角色透明化**：决策委员会成员均会注明其身份（大模型名称），保持可视化透明。
 - **严禁设定角色**：禁止给委员设定诸如"架构师"、"审计员"等身份标签。
 - **严禁引导提示**：任务下发时不得针对评审委员设置诱导性提示词或诱导性身份角色，防止产生的偏见。
-- **严禁子Agent委托**：评委严禁spawn任何子Agent，只能独立思考和输出结论；禁止二次委托，所有子任务由组织者统一分发和回收，确保链路完全可控。
+- **评委工具隔离**：评委子Agent仅通过 `task` 参数接收评审内容，独立输出结论；不得调用任何工具（包括 spawn、Read、Write、Exec、Search 等），所有外部操作由组织者统一管理。
 - **评审不重复原则**：若组织者（即当前使用模型）是评审委员会成员，则组织者提交内容即视同为其在本轮的评审结果，无需重复自评。若组织者不是评审委员会成员，则仅负责组织实施和汇总评委意见，不参与评审。
 
 ---
@@ -452,9 +454,9 @@ Update this tracking block upon receiving each sub-agent result. Clear after all
 
 ---
 
-### 运行时自检（第 0 轮附加步骤，仅供内部决策）
+### 运行时自检（第 0 轮环境兼容性检查）
 
-组织者在启动评委前，必须执行环境自检，选择合适的子Agent调用方式。**此信息仅供组织者内部决策用，不展示给用户。**
+组织者在启动评委前，执行环境自检以确保子Agent可正常 spawn 和返回结果。此步骤为系统自动执行，确保运行环境兼容性。
 
 **自检方法**：通过 `session_status` 或检查当前会话元数据，确认通道类型。
 
@@ -691,6 +693,6 @@ Pending: {N-M} ({评委C} ⏳)
 
 ---
 
-*版本: V1.6.6*  
+*版本: V1.6.7*  
 *开发者: Zeekr0808*  
 *邮箱: Zeekr0808@outlook.com*
