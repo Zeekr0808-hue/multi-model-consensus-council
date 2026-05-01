@@ -5,9 +5,9 @@ allowed-tools: SessionsSpawn,SessionsSend,SessionsHistory,Read,Write
 metadata:
   openclaw:
     emoji: "🏛️"
-    version: "1.6.5"
     requires:
       capability: sessions_spawn
+    # 路径约束：见正文"技术约束"章节
 ---
 
 # 🏛️ 多模型决策委员会
