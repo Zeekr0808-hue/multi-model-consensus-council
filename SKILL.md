@@ -280,9 +280,15 @@ Spawn 子Agent → sessions_yield 挂起 → 收到 subagent_announce 事件 →
    - 是 → 进入下一轮或输出最终报告
    - 否 → 继续等待（再次 yield）
 
-⚠️ **禁止行为**：
-- 禁止用 `sessions_list`、`subagents list` 或 `exec sleep` 轮询
-- 禁止在 spawn 后立即输出最终结论（必须等待所有结果回流）
+⚠️ **禁止行为（铁律）**：
+
+1. **严禁跳过 sessions_yield**：spawn 评委后必须立即调用 `sessions_yield` 挂起，等待 `subagent_announce` 事件触发结果回流。严禁在结果未到达前主动调用任何工具查询结果（含 `sessions_history`）。
+
+2. **严禁跳轮宣布**：宣布进入下一轮前，必须先完成本轮所有评委结果的收集。未收集完全就宣布进入下一轮等同于「规则执行偏差」。
+
+3. **严禁用 sessions_list / subagents list / exec sleep 做状态探测**：任何形式的主动轮询均禁止，push-based 事件驱动是唯一合法结果回收方式。
+
+4. **严禁在结果未全部到达时输出最终报告**：必须等待所有评委返回，或等待超时后以已到达结果继续，同时标记未到达评委为「超时-未提交」。
 
 ### 标准调用示例
 
@@ -344,6 +350,7 @@ Pending: {N-M} ({评委C} ⏳)
 | 规则执行偏差 | 组织者在执行中发现某委员的评审结果违反本skill规定的流程（如跳轮、跳过通过判定等），应要求该委员重新按规则执行，不得擅自修改委员结论 |
 | 超时处理 | 单轮超过120秒仍有评委未返回结果时，组织者对超时评委标记「超时-未提交」，以已返回的评委结果进行汇总和判定 |
 | 结果未回流 | 若 spawn 后未收到 subagent_announce 事件，检查是否使用了 sessions_yield 挂起，或 runtime/mode 配置是否正确 |
+| 框架绕过 | 组织者绕过 skill 机制私自操作（如绕 sessions_yield 直接查 history、跳轮宣布等），应立即承认并通知用户，由用户决定是重新发起还是继续 |
 
 ---
 
@@ -375,6 +382,16 @@ Pending: {N-M} ({评委C} ⏳)
 | [references/OUTPUT_TEMPLATE.md](references/OUTPUT_TEMPLATE.md) | 6段式报告完整模板 + 评委 Prompt |
 | [references/SCHEMA.md](references/SCHEMA.md) | 状态文件字段规范（已归档，V1.6.0 起不再强制使用） |
 | [references/TROUBLESHOOTING.md](references/TROUBLESHOOTING.md) | 常见失败模式与排查指南（V1.6.0 新增） |
+
+---
+
+## 更新日志
+
+| 版本 | 日期 | 变更内容 |
+|:---:|:---:|:---|
+| V1.7.0 | 2026-05-07 | 禁止行为升级为4条铁律（严禁跳过sessions_yield/严禁跳轮宣布/严禁轮询/严禁提前输出）；异常处理规则新增「框架绕过」类型 |
+| V1.6.0 | — | 改用会话上下文跟踪，废除状态文件 |
+| V1.5.0 | — | webchat环境适配 |
 
 ---
 
